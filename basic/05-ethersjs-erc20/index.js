@@ -43,7 +43,6 @@ let wallet = new ethers.Wallet(account_from.privateKey, provider);
 */
 // Create Contract Instance with Signer
 const deployContractIns = new ethers.ContractFactory(abi, bytecode, wallet);
-
 const Trans = async () => {
   console.log('===============================1. Deploy Contract');
   console.log(`Attempting to deploy from account: ${wallet.address}`);
@@ -73,7 +72,6 @@ const Trans = async () => {
     abi,
     wallet
   );
-
   console.log(
     `Transfer 100000 to address: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`
   );
@@ -151,11 +149,9 @@ const Trans = async () => {
     );
     await transferTransaction.wait();
 
-    if (step == 2) {
-      console.log('Going to remove all Listeners');
-      providerContract.removeAllListeners();
-    }
   }
+  console.log('Going to remove all Listeners');
+  providerContract.removeAllListeners();
 };
 
 Trans()

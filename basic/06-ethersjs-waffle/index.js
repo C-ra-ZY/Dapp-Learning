@@ -1,5 +1,5 @@
 const fs = require("fs");
-const SimpleToken = require("./build/SimpleToken.json");
+const SimpleTokenJson = require("./build/SimpleToken.json");
 
 const { ethers } = require("ethers");
 
@@ -22,45 +22,44 @@ let bal;
 
 // support eip1559
 async function getGasPrice() {
-  return await web3Provider.getFeeData().then(async function (res) {
-    let maxFeePerGas = res.maxFeePerGas;
-    let maxPriorityFeePerGas = res.maxPriorityFeePerGas;
-    console.log("maxFeePerGas: ", maxFeePerGas.toString());
-    console.log("maxPriorityFeePerGas:", maxPriorityFeePerGas.toString());
+  const res = await web3Provider.getFeeData()
+  let maxFeePerGas = res.maxFeePerGas;
+  let maxPriorityFeePerGas = res.maxPriorityFeePerGas;
+  console.log("maxFeePerGas: ", maxFeePerGas.toString());
+  console.log("maxPriorityFeePerGas:", maxPriorityFeePerGas.toString());
 
-    return {
-      maxFeePerGas: maxFeePerGas,
-      maxPriorityFeePerGas: maxPriorityFeePerGas,
-    };
-  });
+  return {
+    maxFeePerGas: maxFeePerGas,
+    maxPriorityFeePerGas: maxPriorityFeePerGas,
+  };
 }
 
 async function checkBalance() {
-  bal = await web3Provider.getBalance(address).then((balance) => {
-    // balance is a BigNumber (in wei); format is as a sting (in ether)
-    let etherString = ethers.utils.formatEther(balance);
-    return etherString;
-  });
-  console.log("balance: ", bal);
+  const balance = await web3Provider.getBalance(address)
+  // balance is a BigNumber (in wei); format is as a sting (in ether)
+  let etherString = ethers.utils.formatEther(balance);
+  return etherString;
 }
 
-checkBalance();
+
 
 let token;
-async function deploy() {
+async function deploy(etherBalanceString) {
+  console.log("balance: ", etherBalanceString);
   let option = await getGasPrice();
   // 常见合约工厂实例
-  const simpletoken = new ethers.ContractFactory(
-    SimpleToken.abi,
-    SimpleToken.bytecode,
+  const simpleToken = new ethers.ContractFactory(
+    SimpleTokenJson.abi,
+    SimpleTokenJson.bytecode,
     wallet
   );
-  token = await simpletoken.deploy("HEHE", "HH", 1, 100000000);
+  token = await simpleToken.deploy("HEHE", "HH", 1, 100000000);
   tx = await token.transfer(
     "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
     ethers.utils.parseEther("0.00000000001"),
     option
   );
+  console.log(wallet.address);
   console.log(token.address);
 
   console.log(token.deployTransaction.hash);
@@ -70,5 +69,4 @@ async function deploy() {
   let bal = await token.balanceOf(wallet.address);
   console.log(bal.toString());
 }
-
-deploy();
+checkBalance().then(deploy);

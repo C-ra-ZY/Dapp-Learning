@@ -4,6 +4,7 @@ const solc = require('solc');
 // Get Path and Load Contract
 const source = fs.readFileSync('SimpleToken.sol', 'utf8');
 function findImports(path) {
+  console.log(`path is: ${path}`)
   if (fs.existsSync(path)) {
     return {
       contents: fs.readFileSync(path, 'utf8'),
